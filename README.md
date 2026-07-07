@@ -3,8 +3,7 @@
 Nadir Gold müşteri + ticaret API'si için `pytest` tabanlı API test yapısı.
 Kaynak döküman: [`nadir-v2.md`](./nadir-v2.md)
 
-![API Tests](https://github.com/OWNER/REPO/actions/workflows/api-tests.yml/badge.svg)
-<!-- ↑ repo push edilince OWNER/REPO yerine gercek yolu yaz -->
+[![API Tests](https://github.com/mirackasapoglu-qa/NADIRGOLD-API/actions/workflows/api-tests.yml/badge.svg)](https://github.com/mirackasapoglu-qa/NADIRGOLD-API/actions/workflows/api-tests.yml)
 
 ## CI (GitHub Actions)
 
