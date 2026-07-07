@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LoginResponse",
+  "type": "object",
+  "required": ["success", "data"],
+  "properties": {
+    "success": { "const": true },
+    "data": {
+      "type": "object",
+      "required": ["token", "customer"],
+      "properties": {
+        "token": { "type": "string", "minLength": 1 },
+        "customer": {
+          "type": "object",
+          "required": ["customerId", "email"],
+          "properties": {
+            "customerId": { "type": "integer" },
+            "email": { "type": "string" },
+            "phone": { "type": ["string", "null"] },
+            "gender": { "type": ["string", "null"] },
+            "firstName": { "type": ["string", "null"] },
+            "lastName": { "type": ["string", "null"] },
+            "identityNumber": { "type": ["string", "null"] },
+            "photo": { "type": ["string", "null"] },
+            "birthday": { "type": ["string", "null"] },
+            "emailVerify": { "type": "integer" }
+          }
+        },
+        "deviceToken": { "type": ["string", "null"] },
+        "basketMerge": { "type": "boolean" }
+      }
+    }
+  }
+}

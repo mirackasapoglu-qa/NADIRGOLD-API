@@ -1,0 +1,342 @@
+<style>
+  :root {
+    --bg: #FBFAF6;
+    --surface: #FFFFFF;
+    --surface-2: #F6F3EB;
+    --border: #E6E1D3;
+    --border-strong: #D6CFBC;
+    --ink: #211E17;
+    --ink-2: #4A463B;
+    --muted: #75705F;
+    --gold: #8A6D22;
+    --gold-soft: #F1E7C8;
+
+    --ok: #1E7A49;      --ok-bg: #E6F2EA;
+    --skip: #52617C;    --skip-bg: #E9EDF3;
+    --warn: #A9631A;    --warn-bg: #F9EDDD;
+    --crit: #AF382E;    --crit-bg: #F9E7E4;
+    --info: #2C5C93;    --info-bg: #E6EEF7;
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+    --maxw: 1080px;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(33,30,23,.05), 0 4px 16px rgba(33,30,23,.04);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14120C;
+      --surface: #1D1A12;
+      --surface-2: #241F16;
+      --border: #322C1F;
+      --border-strong: #423A29;
+      --ink: #F0ECDF;
+      --ink-2: #CFC8B6;
+      --muted: #9A927E;
+      --gold: #CBA24A;
+      --gold-soft: #352E19;
+
+      --ok: #5FBE86;      --ok-bg: #16281E;
+      --skip: #9AAAC4;    --skip-bg: #1B2130;
+      --warn: #D89448;    --warn-bg: #2E2214;
+      --crit: #E07568;    --crit-bg: #2E1815;
+      --info: #7FAEE0;    --info-bg: #16202E;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg:#FBFAF6; --surface:#FFFFFF; --surface-2:#F6F3EB; --border:#E6E1D3; --border-strong:#D6CFBC;
+    --ink:#211E17; --ink-2:#4A463B; --muted:#75705F; --gold:#8A6D22; --gold-soft:#F1E7C8;
+    --ok:#1E7A49;--ok-bg:#E6F2EA;--skip:#52617C;--skip-bg:#E9EDF3;--warn:#A9631A;--warn-bg:#F9EDDD;
+    --crit:#AF382E;--crit-bg:#F9E7E4;--info:#2C5C93;--info-bg:#E6EEF7;
+  }
+  :root[data-theme="dark"] {
+    --bg:#14120C; --surface:#1D1A12; --surface-2:#241F16; --border:#322C1F; --border-strong:#423A29;
+    --ink:#F0ECDF; --ink-2:#CFC8B6; --muted:#9A927E; --gold:#CBA24A; --gold-soft:#352E19;
+    --ok:#5FBE86;--ok-bg:#16281E;--skip:#9AAAC4;--skip-bg:#1B2130;--warn:#D89448;--warn-bg:#2E2214;
+    --crit:#E07568;--crit-bg:#2E1815;--info:#7FAEE0;--info-bg:#16202E;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--font-sans); line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 48px 24px 80px; }
+
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--gold); font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .eyebrow::before { content:""; width: 22px; height: 2px; background: var(--gold); display:inline-block; }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 40px); line-height: 1.08; margin: 14px 0 0;
+    letter-spacing: -.02em; text-wrap: balance; font-weight: 700;
+  }
+  .sub { color: var(--muted); margin: 10px 0 0; font-size: 15px; max-width: 62ch; }
+
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 22px;
+    font-family: var(--font-mono); font-size: 12.5px;
+  }
+  .meta span {
+    background: var(--surface-2); border: 1px solid var(--border);
+    padding: 5px 10px; border-radius: 999px; color: var(--ink-2);
+  }
+  .meta b { color: var(--ink); font-weight: 600; }
+
+  h2 {
+    font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700; margin: 0 0 16px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+  }
+  h2 .count { font-family: var(--font-mono); color: var(--muted); letter-spacing:0; }
+  section { margin-top: 44px; }
+
+  /* stat tiles */
+  .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .tile {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 16px 14px; box-shadow: var(--shadow);
+    position: relative; overflow: hidden;
+  }
+  .tile::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--tc, var(--border-strong)); }
+  .tile .n { font-family: var(--font-mono); font-size: 30px; font-weight: 600; line-height:1; font-variant-numeric: tabular-nums; color: var(--tc, var(--ink)); }
+  .tile .l { font-size: 12px; color: var(--muted); margin-top: 8px; letter-spacing:.02em; }
+  .tile.ok{--tc:var(--ok);} .tile.skip{--tc:var(--skip);} .tile.warn{--tc:var(--warn);}
+  .tile.crit{--tc:var(--crit);} .tile.total{--tc:var(--gold);}
+
+  .bar { display:flex; height: 10px; border-radius: 999px; overflow: hidden; margin-top: 18px; border:1px solid var(--border); }
+  .bar i { display:block; height:100%; }
+  .bar .b-ok{background:var(--ok);} .bar .b-skip{background:var(--skip);} .bar .b-warn{background:var(--warn);}
+  .legend { display:flex; flex-wrap:wrap; gap:16px; margin-top:12px; font-size:12.5px; color:var(--muted); }
+  .legend i { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px; vertical-align:middle; }
+
+  .verdict {
+    margin-top: 20px; background: var(--ok-bg); border: 1px solid color-mix(in srgb, var(--ok) 30%, transparent);
+    border-radius: var(--radius); padding: 14px 16px; font-size: 14.5px; color: var(--ink);
+  }
+  .verdict b { color: var(--ok); }
+
+  /* finding cards */
+  .findings { display: grid; gap: 12px; }
+  .find {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 18px 16px 20px; box-shadow: var(--shadow); position: relative; overflow:hidden;
+  }
+  .find::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background: var(--sc); }
+  .find.crit{--sc:var(--crit);} .find.warn{--sc:var(--warn);} .find.info{--sc:var(--info);}
+  .find-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .find-head .t { font-weight: 650; font-size: 15px; }
+  .find p { margin: 8px 0 0; color: var(--ink-2); font-size: 14px; }
+  .find code, code.inline {
+    font-family: var(--font-mono); font-size: .88em; background: var(--surface-2);
+    border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .pill {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .03em;
+    padding: 3px 9px; border-radius: 999px; text-transform: uppercase; white-space: nowrap;
+    border: 1px solid transparent;
+  }
+  .p-crit{background:var(--crit-bg); color:var(--crit); border-color: color-mix(in srgb, var(--crit) 25%, transparent);}
+  .p-warn{background:var(--warn-bg); color:var(--warn); border-color: color-mix(in srgb, var(--warn) 25%, transparent);}
+  .p-info{background:var(--info-bg); color:var(--info); border-color: color-mix(in srgb, var(--info) 25%, transparent);}
+  .p-ok{background:var(--ok-bg); color:var(--ok); border-color: color-mix(in srgb, var(--ok) 25%, transparent);}
+  .p-skip{background:var(--skip-bg); color:var(--skip); border-color: color-mix(in srgb, var(--skip) 25%, transparent);}
+
+  /* tables */
+  .tw { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 560px; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  thead th {
+    background: var(--surface-2); font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--muted); font-weight: 700; position: sticky; top: 0;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { background: var(--surface); }
+  td.path, td .mono { font-family: var(--font-mono); font-size: 12.5px; }
+  .path-live { color: var(--ok); }
+  .path-doc { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--crit) 55%, transparent); }
+  .arrow { color: var(--muted); padding: 0 4px; }
+  .grp td { background: var(--surface-2); font-family: var(--font-mono); font-size: 11.5px; letter-spacing:.05em; text-transform:uppercase; color: var(--gold); font-weight: 600; }
+
+  /* action list */
+  ol.acts { counter-reset: a; list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  ol.acts li {
+    counter-increment: a; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px 14px 52px; position: relative; font-size: 14px; color: var(--ink-2);
+  }
+  ol.acts li::before {
+    content: counter(a); position: absolute; left: 14px; top: 13px;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--gold);
+    background: var(--gold-soft); width: 24px; height: 24px; border-radius: 6px;
+    display: grid; place-items: center;
+  }
+  ol.acts li b { color: var(--ink); }
+  .owner { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12.5px; font-family: var(--font-mono); }
+
+  @media (max-width: 720px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .wrap { padding: 32px 16px 60px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">QA · API Test Raporu</div>
+    <h1>Nadir Gold API — Test Durumu</h1>
+    <p class="sub">Müşteri servisi (auth, OTP, şifre, iletişim, profil) ve ticaret servisi (sepet) endpoint'leri için kurulan otomatik test yapısının canlı ortama karşı ilk koşum sonuçları ve döküman&nbsp;↔&nbsp;canlı uyuşmazlıkları.</p>
+    <div class="meta">
+      <span>Tarih <b>7 Tem 2026</b></span>
+      <span>Ortam <b>api-v2.nadirgold.dev</b></span>
+      <span>Stack <b>pytest + requests + jsonschema</b></span>
+      <span>Kaynak <b>nadir-v2.md</b></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Özet <span class="count">30 test</span></h2>
+    <div class="tiles">
+      <div class="tile total"><div class="n">30</div><div class="l">Toplam test</div></div>
+      <div class="tile ok"><div class="n">26</div><div class="l">Geçti</div></div>
+      <div class="tile skip"><div class="n">2</div><div class="l">Atlandı (503)</div></div>
+      <div class="tile warn"><div class="n">2</div><div class="l">xfail (bilinen)</div></div>
+      <div class="tile crit"><div class="n">0</div><div class="l">Başarısız</div></div>
+    </div>
+    <div class="bar" role="img" aria-label="26 geçti, 2 atlandı, 2 xfail">
+      <i class="b-ok" style="width:86.7%"></i>
+      <i class="b-skip" style="width:6.65%"></i>
+      <i class="b-warn" style="width:6.65%"></i>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--ok)"></i>Geçti · 26</span>
+      <span><i style="background:var(--skip)"></i>Atlandı · 2 (commerce servisi kapalı)</span>
+      <span><i style="background:var(--warn)"></i>xfail · 2 (endpoint yolu doğrulanamadı)</span>
+    </div>
+    <div class="verdict">
+      <b>Yapı çalışıyor ve canlıya bağlanıyor.</b> Auth / OTP / şifre / iletişim / profil akışları uçtan uca doğrulandı. Kalan 4 test, test hatası değil — <b>iki altyapı/backend engeline</b> takılıyor (aşağıda). Beklemedeki testler bu engeller çözülünce otomatik yeşile döner.
+    </div>
+  </section>
+
+  <section>
+    <h2>Engeller &amp; bulgular <span class="count">öncelik sırasına göre</span></h2>
+    <div class="findings">
+
+      <div class="find crit">
+        <div class="find-head"><span class="pill p-crit">Bağlantı</span><span class="t">Verilen adresteki <code>:3001</code> portu erişilemiyor</span></div>
+        <p><code class="inline">api-v2.nadirgold.dev:3001</code> Cloudflare arkasında ve Cloudflare bu portu proxy'lemiyor → istekler <b>zaman aşımına</b> uğruyor. Çalışan adres <b>portsuz</b> (443): <code class="inline">https://api-v2.nadirgold.dev</code>. Test yapılandırması buna göre ayarlandı.</p>
+      </div>
+
+      <div class="find crit">
+        <div class="find-head"><span class="pill p-crit">Backend</span><span class="t">Commerce (sepet) servisi <code>503</code> dönüyor</span></div>
+        <p><code class="inline">POST /basket/add</code> geçerli token <b>ve</b> geçerli SKU ile bile <code class="inline">503 "Service unavailable"</code> veriyor — servis ayakta değil. <code class="inline">basket/get · update · delete</code> ise gateway'de <code class="inline">404</code>. Tüm sepet akışı şu an test edilemiyor <span class="pill p-skip">2 test skip</span></p>
+      </div>
+
+      <div class="find warn">
+        <div class="find-head"><span class="pill p-warn">Bot koruması</span><span class="t">Cloudflare varsayılan Python istemcisini banlıyor (hata 1010)</span></div>
+        <p>Python <code class="inline">urllib</code> User-Agent'ı <code class="inline">403</code> ile reddediliyor. Çözüldü: test istemcisine tarayıcı benzeri bir <code class="inline">User-Agent</code> header'ı eklendi. CI/otomasyon kuran herkesin bunu bilmesi gerekiyor.</p>
+      </div>
+
+      <div class="find warn">
+        <div class="find-head"><span class="pill p-warn">Eksik endpoint</span><span class="t"><code>forgotPasswordSet</code> yolu doğrulanamadı</span></div>
+        <p>Dökümandaki <code class="inline">/customer/forgotPasswordSet</code> ve denenen tüm varyantlar canlıda <code class="inline">404</code>. İlgili 2 test <b>xfail</b> ile işaretli. İpucu: gateway <code class="inline">/customer/forgot-password/*</code> isteğini <code class="inline">/auth/forgot-password/*</code> olarak yeniden yazıyor — doğru yol backend'den teyit edilmeli.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Yanlış endpoint yolları <span class="count">döküman ≠ canlı</span></h2>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Endpoint</th><th>Dökümanda (yanlış)</th><th>Canlı (doğru)</th></tr></thead>
+        <tbody>
+          <tr><td>Giriş (login)</td><td class="path"><span class="path-doc">/api/v1/auth/login</span></td><td class="path"><span class="path-live">/api/v1/customer/login</span></td></tr>
+          <tr><td>OTP doğrula</td><td class="path"><span class="path-doc">/api/v1/otp/verify</span></td><td class="path"><span class="path-live">/api/v1/customer/otp/verify</span></td></tr>
+          <tr><td>Şifre sıfırlama</td><td class="path"><span class="path-doc">/customer/forgotPassword</span></td><td class="path"><span class="path-live">/customer/forgot-password</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Davranış / status farkları</h2>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Endpoint</th><th>Döküman</th><th>Canlı</th><th>Not</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">POST /customer/contact</td><td class="mono">200</td><td class="mono" style="color:var(--warn)">201</td><td>POST-create semantiği; test 200/201 kabul edecek şekilde güncellendi</td></tr>
+          <tr><td class="mono">POST /basket/add</td><td>Misafir <code class="inline">basketHash</code> ile eklenebilir</td><td class="mono" style="color:var(--crit)">401 → 503</td><td>Auth zorunlu; sonrasında servis kapalı</td></tr>
+          <tr><td>Hata gövdesi</td><td class="mono">statusCode, message, error</td><td class="mono">+ errors.validation[]</td><td>Şema toleranslı bırakıldı</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Endpoint kapsamı <span class="count">15 endpoint</span></h2>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Endpoint</th><th>Metot &amp; yol</th><th>Durum</th></tr></thead>
+        <tbody>
+          <tr class="grp"><td colspan="3">Müşteri servisi — Auth</td></tr>
+          <tr><td>Kayıt (register)</td><td class="mono">POST /customer/register</td><td><span class="pill p-ok">Doğrulandı</span></td></tr>
+          <tr><td>Ön kayıt</td><td class="mono">POST /customer/pre-register</td><td><span class="pill p-ok">Doğrulandı</span></td></tr>
+          <tr><td>Giriş</td><td class="mono">POST /customer/login</td><td><span class="pill p-ok">Doğrulandı</span> <span class="pill p-warn">yol farkı</span></td></tr>
+          <tr><td>Çıkış</td><td class="mono">POST /customer/logout</td><td><span class="pill p-ok">Doğrulandı</span></td></tr>
+          <tr class="grp"><td colspan="3">Müşteri servisi — Şifre sıfırlama</td></tr>
+          <tr><td>Sıfırlama e-postası</td><td class="mono">POST /customer/forgot-password</td><td><span class="pill p-ok">Doğrulandı</span> <span class="pill p-warn">yol farkı</span></td></tr>
+          <tr><td>Yeni şifre belirle</td><td class="mono">POST /customer/forgotPasswordSet</td><td><span class="pill p-warn">404 · xfail</span></td></tr>
+          <tr class="grp"><td colspan="3">Müşteri servisi — OTP</td></tr>
+          <tr><td>OTP gönder</td><td class="mono">POST /customer/otp</td><td><span class="pill p-ok">Doğrulandı</span></td></tr>
+          <tr><td>OTP doğrula</td><td class="mono">POST /customer/otp/verify</td><td><span class="pill p-ok">Doğrulandı</span> <span class="pill p-warn">yol farkı</span></td></tr>
+          <tr><td>OTP yeniden gönder</td><td class="mono">POST /customer/otp/resend</td><td><span class="pill p-ok">Doğrulandı</span></td></tr>
+          <tr class="grp"><td colspan="3">Müşteri servisi — İletişim &amp; Profil</td></tr>
+          <tr><td>İletişim formu</td><td class="mono">POST /customer/contact</td><td><span class="pill p-ok">Doğrulandı</span> <span class="pill p-warn">201≠200</span></td></tr>
+          <tr><td>Profil</td><td class="mono">GET /customer/detail</td><td><span class="pill p-ok">Doğrulandı</span></td></tr>
+          <tr class="grp"><td colspan="3">Ticaret servisi — Sepet</td></tr>
+          <tr><td>Sepete ekle</td><td class="mono">POST /basket/add</td><td><span class="pill p-crit">503 · servis kapalı</span></td></tr>
+          <tr><td>Sepeti getir</td><td class="mono">GET /basket/get</td><td><span class="pill p-crit">404 · erişilemedi</span></td></tr>
+          <tr><td>Sepeti güncelle</td><td class="mono">PUT /basket/update</td><td><span class="pill p-crit">404 · erişilemedi</span></td></tr>
+          <tr><td>Sepetten sil</td><td class="mono">DELETE /basket/delete</td><td><span class="pill p-crit">404 · erişilemedi</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Kayıt akışı — teyit edilen kurallar</h2>
+    <div class="findings">
+      <div class="find info">
+        <div class="find-head"><span class="pill p-info">Otomasyon</span><span class="t">Test suite kendi hesabını yaratıyor</span></div>
+        <p><code class="inline">register</code> OTP kapalı ve doğrudan token dönüyor → dışarıdan test hesabına gerek yok. Kurallar: <b>telefon benzersiz olmalı</b>, <b>TC kimlik no checksum'ı geçerli olmalı</b> (üretici eklendi), başarı yanıtı <b>200</b>, ve <b>logout Bearer JWT'yi geçersiz kılmıyor</b> (stateless).</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Aksiyon maddeleri</h2>
+    <ol class="acts">
+      <li><b>Commerce servisini ayağa kaldır</b> — <code class="inline">basket/*</code> tümü 503/404. Sepet testleri servis dönünce otomatik koşacak. <span class="owner">→ Backend / DevOps</span></li>
+      <li><b>Dökümanı düzelt</b> — login, otp/verify, forgot-password yolları + contact 201 status. <span class="owner">→ Döküman sahibi</span></li>
+      <li><b><code class="inline">forgotPasswordSet</code> doğru yolunu bildir</b> — xfail testler güncellenip aktifleşecek. <span class="owner">→ Backend</span></li>
+      <li><b>Base URL netleştir</b> — <code class="inline">:3001</code> Cloudflare page-rule ile açılacak mı, yoksa portsuz adres mi standart? <span class="owner">→ DevOps</span></li>
+      <li><b>Test hesabı için OTP'siz e-posta doğrulaması</b> gözden geçir — şu an kayıt anında <code class="inline">emailVerify:1</code> geliyor. <span class="owner">→ Backend</span></li>
+    </ol>
+  </section>
+
+  <footer>
+    Nadir Gold API test suite · pytest -m smoke|auth|negative · rapor: DISCREPANCIES.md · üretim: Claude Code
+  </footer>
+
+</div>

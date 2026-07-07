@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HashResponse",
+  "description": "pre-register / otp / otp-resend gibi hash donduren endpointler",
+  "type": "object",
+  "required": ["success", "data"],
+  "properties": {
+    "success": { "const": true },
+    "data": {
+      "type": "object",
+      "required": ["hash"],
+      "properties": {
+        "hash": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
