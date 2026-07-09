@@ -86,6 +86,26 @@ Kaynak: V1 `NadirgoldV1.md` (Apidog export, 235 uç) ↔ V2 `nadir-v2` (16 müş
 - V1 iç tutarsızlıkları: `basket/get` → `basket_hash` (snake), diğerleri `basketHash` (camel); `merchantId` Add'te string / Update'te integer; yol prefix'i (`/DOMAIN/`) bazı uçlarda var bazılarında yok.
 - **Kapsam:** V2 yalnızca bu 16 müşteri ucunu kapsıyor; V1'deki diğer ~219 uç (adres, banka, KYC, tasarruf, sipariş, LOGO, lojistik…) V2 `nadir-v2` spec'inde yok.
 
+## 🟣 Response şema tip hatası (Customer Service OpenAPI)
+
+Otoritatif `customer-service-openapi.json` ile contract koşumunda (`response_schema_conformance`) yakalandı:
+
+| Şema | Alanlar | Spec tanımı | Canlı gerçek | Kayıt |
+|---|---|---|---|---|
+| `LoginCustomerDto` | `gender` · `identityNumber` · `photo` · `birthday` | `type: object, nullable` | **string / null** (ör. `"12345678901"`, `"1990-01-15"`) | **NSB-5869** |
+
+`login` / `register` / `detail` 200 yanıtları bu yüzden şemayı ihlal ediyor. Olması gereken: `type: string, nullable: true` (NestJS DTO tip anotasyonu eksik → Swagger `object`'e düşüyor).
+
+## 🔴 Robustluk / güvenlik bulguları (boundary & security testleri)
+
+| Bulgu | Endpoint | Gözlem | Beklenen | Kayıt |
+|---|---|---|---|---|
+| Büyük payload → 500 | `POST /customer/login` | `password` ~200 KB+ → **500** "Beklenmedik bir hata" (≤100 KB → 401) | 400 / 413 | **NSB-5867** |
+
+Test taraması ayrıca şunları **doğruladı (sorun yok):** gecersiz/bozuk/eksik JWT → 401 · uydurma `basketHash` veri sızdırmıyor · SQLi/NoSQLi denemeleri 401/400 (bypass yok, 5xx yok) · yanlış HTTP metodu 404/405 · Unicode/emoji/homoglyph girdiler 5xx patlatmıyor · pre-register/forgot-password idempotent · eşzamanlı pre-register 5xx'siz.
+
+> Not: rate-limit probe ve yazma-race testleri Cloudflare ban / veri kirliliği riskiyle **varsayılan kapalı** (`RUN_RATELIMIT=1` / `RUN_WRITE_RACE=1`).
+
 ## ✅ Kayıt (register) akışı — kurallar
 
 `register` **OTP kapalı** ve doğrudan token dönüyor → test suite dışarıdan hesap gerektirmeden kendi hesabını yaratıp login/logout/profil'i test edebiliyor. Ancak:

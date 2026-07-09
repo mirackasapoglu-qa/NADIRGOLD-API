@@ -1,216 +1,186 @@
 {
-  "openapi": "3.1.0",
-  "info": {
-    "title": "Nadir Gold API — Contract (nadir-v2)",
-    "description": "Apidog nadir-v2 spec'inden bundle edilmis contract dosyasi.",
-    "version": "1.0.0"
-  },
-  "servers": [
-    {
-      "url": "https://api-v2.nadirgold.dev"
-    }
-  ],
+  "openapi": "3.0.0",
   "paths": {
-    "/api/v1/customer/delete": {
-      "delete": {
-        "summary": "Delete (Pasife Alma)",
-        "description": "Oturumu sonlandirir. Bearer token zorunludur.",
-        "operationId": "customerDelete",
-        "tags": [
-          "1. Auth"
+    "/api/v1/customer/login-with-device-token": {
+      "post": {
+        "operationId": "AuthController_loginWithDeviceToken",
+        "parameters": [
+          {
+            "name": "app-version",
+            "in": "header",
+            "description": "Uygulama versiyonu",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "device-type",
+            "in": "header",
+            "description": "ios veya android",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "device-name",
+            "in": "header",
+            "description": "Cihaz adı",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "device-token",
+            "in": "header",
+            "description": "Cihaz token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginWithDeviceTokenDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "Basarili",
+            "description": "Giriş başarılı",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": true
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {}
+                      "$ref": "#/components/schemas/LoginResponseDto"
                     }
-                  }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
                 }
               }
             }
           },
+          "400": {
+            "description": "Eksik veya geçersiz cihaz header"
+          },
           "401": {
-            "description": "Token eksik/gecersiz",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+            "description": "Geçersiz kimlik bilgisi veya cihaz token bulunamadı"
           }
         },
-        "security": [
-          {
-            "BearerAuth": []
-          }
+        "summary": "Cihaz token ile giriş — aktif cihaz kaydı gerektirir",
+        "tags": [
+          "auth"
         ]
       }
     },
     "/api/v1/customer/pre-register": {
       "post": {
-        "summary": "On Kayit",
-        "operationId": "preRegister",
-        "tags": [
-          "1. Auth"
-        ],
+        "operationId": "AuthController_preRegister",
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "email"
-                ],
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "format": "email",
-                    "example": "ahmet@example.com"
-                  }
-                }
-              },
-              "example": {
-                "email": "qa_contract_probe@example.com"
+                "$ref": "#/components/schemas/PreRegisterDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Hash olusturuldu",
+            "description": "Hash başarıyla oluşturuldu",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": true
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "hash": {
-                          "type": "string"
-                        }
-                      }
+                      "$ref": "#/components/schemas/PreRegisterResponseDto"
                     }
-                  }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
                 }
               }
             }
           },
           "400": {
-            "description": "E-posta zaten kayitli",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+            "description": "E-posta zaten kayıtlı"
           }
         },
-        "security": []
+        "summary": "Ön kayıt — e-posta doğrulama hash'i oluşturur",
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/customer/register": {
       "post": {
-        "summary": "Kayit Ol",
-        "operationId": "register",
-        "tags": [
-          "1. Auth"
-        ],
+        "operationId": "AuthController_register",
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "firstName",
-                  "lastName",
-                  "hash",
-                  "password",
-                  "passwordConfirmation",
-                  "phone",
-                  "identityNumber",
-                  "birthdate",
-                  "kvkk",
-                  "membership"
-                ],
-                "properties": {
-                  "firstName": {
-                    "type": "string"
-                  },
-                  "lastName": {
-                    "type": "string"
-                  },
-                  "hash": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  },
-                  "passwordConfirmation": {
-                    "type": "string"
-                  },
-                  "phone": {
-                    "type": "string"
-                  },
-                  "identityNumber": {
-                    "type": "string"
-                  },
-                  "birthdate": {
-                    "type": "string",
-                    "format": "date"
-                  },
-                  "kvkk": {
-                    "type": "boolean"
-                  },
-                  "membership": {
-                    "type": "boolean"
-                  }
-                }
-              },
-              "example": {
-                "firstName": "QA",
-                "lastName": "Probe",
-                "hash": "invalid-contract-probe-hash",
-                "password": "gizli123",
-                "passwordConfirmation": "gizli123",
-                "phone": "05551234567",
-                "identityNumber": "12345678901",
-                "birthdate": "1990-01-15",
-                "kvkk": true,
-                "membership": true
+                "$ref": "#/components/schemas/RegisterDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Kayit basarili veya OTP gerekiyor",
+            "description": "Kayıt başarılı veya OTP doğrulaması gerekiyor",
             "content": {
               "application/json": {
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/LoginResponse"
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "data": {
+                          "$ref": "#/components/schemas/LoginResponseDto"
+                        }
+                      }
                     },
                     {
-                      "$ref": "#/components/schemas/OtpRequiredResponse"
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "data": {
+                          "$ref": "#/components/schemas/OtpRequiredResponseDto"
+                        }
+                      }
                     }
                   ]
                 }
@@ -218,750 +188,549 @@
             }
           },
           "400": {
-            "description": "Validasyon hatasi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+            "description": "Geçersiz hash, telefon/kimlik çakışması veya validasyon hatası"
           }
         },
-        "security": []
-      }
-    },
-    "/api/v1/auth/login": {
-      "post": {
-        "summary": "Giris Yap",
-        "operationId": "login",
+        "summary": "Müşteri kaydı — hash ile e-posta doğrulamalı",
         "tags": [
-          "1. Auth"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "email",
-                  "password"
-                ],
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "password": {
-                    "type": "string"
-                  }
-                }
-              },
-              "example": {
-                "email": "qa_contract_probe@example.com",
-                "password": "definitely-wrong-password"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Giris basarili veya OTP gerekiyor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/LoginResponse"
-                    },
-                    {
-                      "$ref": "#/components/schemas/OtpRequiredResponse"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Hatali kimlik bilgisi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": []
+          "auth"
+        ]
       }
     },
     "/api/v1/customer/logout": {
       "post": {
-        "summary": "Cikis Yap",
-        "operationId": "logout",
-        "tags": [
-          "1. Auth"
-        ],
+        "operationId": "AuthController_logout",
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "Cikis basarili",
+            "description": "Çıkış başarılı"
+          },
+          "401": {
+            "description": "Token eksik veya geçersiz"
+          }
+        },
+        "summary": "Oturumu kapat — JWT cookie temizlenir",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/customer/delete": {
+      "delete": {
+        "operationId": "AuthController_deleteAccount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Hesap silindi"
+          },
+          "401": {
+            "description": "Token eksik veya geçersiz"
+          }
+        },
+        "summary": "Hesabı sil — is_active pasif yapılır",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/customer/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Giriş başarılı veya OTP doğrulaması gerekiyor",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "data": {
+                  "oneOf": [
+                    {
                       "type": "object",
-                      "properties": {}
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "data": {
+                          "$ref": "#/components/schemas/LoginResponseDto"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "data": {
+                          "$ref": "#/components/schemas/OtpRequiredResponseDto"
+                        }
+                      }
                     }
-                  }
+                  ]
                 }
               }
             }
           },
           "401": {
-            "description": "Token eksik/gecersiz",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+            "description": "E-posta veya şifre hatalı"
           }
         },
-        "security": [
-          {
-            "BearerAuth": []
-          }
+        "summary": "Müşteri girişi",
+        "tags": [
+          "auth"
         ]
-      }
-    },
-    "/api/v1/customer/forgotPassword": {
-      "post": {
-        "summary": "Sifre Sifirlama E-postasi Gonder",
-        "operationId": "forgotPassword",
-        "tags": [
-          "2. Sifre Sifirlama"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "email"
-                ],
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "format": "email"
-                  }
-                }
-              },
-              "example": {
-                "email": "qa_contract_probe@example.com"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Istek islendi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "E-posta gonderilemedi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": []
-      }
-    },
-    "/api/v1/customer/forgotPasswordSet": {
-      "post": {
-        "summary": "Yeni Sifre Belirle",
-        "operationId": "forgotPasswordReset",
-        "tags": [
-          "2. Sifre Sifirlama"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "hash",
-                  "password",
-                  "passwordConfirmation"
-                ],
-                "properties": {
-                  "hash": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  },
-                  "passwordConfirmation": {
-                    "type": "string"
-                  }
-                }
-              },
-              "example": {
-                "hash": "invalid-contract-probe-hash",
-                "password": "YeniSifre123",
-                "passwordConfirmation": "YeniSifre123"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Sifre guncellendi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Gecersiz token veya sifreler uyusmuyor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": []
       }
     },
     "/api/v1/customer/otp": {
       "post": {
-        "summary": "OTP Gonder",
-        "operationId": "otpSend",
-        "tags": [
-          "3. OTP"
-        ],
+        "operationId": "OtpController_sendCode",
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "phone"
-                ],
-                "properties": {
-                  "phone": {
-                    "type": "string"
-                  }
-                }
-              },
-              "example": {
-                "phone": "not-a-valid-phone"
+                "$ref": "#/components/schemas/OtpSendDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OTP gonderildi",
+            "description": "OTP gönderildi, hash döner",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": true
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "hash": {
-                          "type": "string"
-                        }
-                      }
+                      "$ref": "#/components/schemas/OtpSendResponseDto"
                     }
-                  }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
                 }
               }
             }
           },
           "400": {
-            "description": "Gecersiz telefon",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+            "description": "Geçersiz telefon numarası"
           }
         },
-        "security": []
+        "summary": "Telefon numarasına OTP kodu gönderir",
+        "tags": [
+          "otp"
+        ]
       }
     },
-    "/api/v1/otp/verify": {
+    "/api/v1/customer/otp/verify": {
       "post": {
-        "summary": "OTP Dogrula",
-        "operationId": "otpVerify",
-        "tags": [
-          "3. OTP"
-        ],
+        "operationId": "OtpController_verify",
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "hash",
-                  "verifyCode"
-                ],
-                "properties": {
-                  "hash": {
-                    "type": "string"
-                  },
-                  "verifyCode": {
-                    "type": "string"
-                  }
-                }
-              },
-              "example": {
-                "hash": "invalid-contract-probe-hash",
-                "verifyCode": "000000"
+                "$ref": "#/components/schemas/OtpVerifyDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Dogrulama basarili",
+            "description": "Doğrulama başarılı",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": true
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "verified": {
-                          "type": "boolean"
-                        }
-                      }
+                      "$ref": "#/components/schemas/OtpVerifyResponseDto"
                     }
-                  }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
                 }
               }
             }
           },
           "400": {
-            "description": "Gecersiz kod / suresi dolmus",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+            "description": "Geçersiz kod veya süresi dolmuş"
           }
         },
-        "security": []
+        "summary": "OTP kodunu doğrular",
+        "tags": [
+          "otp"
+        ]
       }
     },
     "/api/v1/customer/otp/resend": {
       "post": {
-        "summary": "OTP Yeniden Gonder",
-        "operationId": "otpResend",
-        "tags": [
-          "3. OTP"
-        ],
+        "operationId": "OtpController_resendCode",
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "hash"
-                ],
-                "properties": {
-                  "hash": {
-                    "type": "string"
-                  }
-                }
-              },
-              "example": {
-                "hash": "invalid-contract-probe-hash"
+                "$ref": "#/components/schemas/OtpResendDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Yeni OTP gonderildi",
+            "description": "OTP yeniden gönderildi, yeni hash döner",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "success": {
-                      "type": "boolean"
+                      "type": "boolean",
+                      "example": true
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "hash": {
-                          "type": "string"
-                        }
-                      }
+                      "$ref": "#/components/schemas/OtpResendResponseDto"
                     }
-                  }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
                 }
               }
             }
           },
           "400": {
-            "description": "Gecersiz/kullanilmis hash",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+            "description": "Geçersiz veya kullanılmış OTP hash'i"
           }
         },
-        "security": []
+        "summary": "OTP kodunu yeniden gönderir — mevcut hash gereklidir",
+        "tags": [
+          "otp"
+        ]
       }
     },
-    "/api/v1/customer/contact": {
+    "/api/v1/customer/forgot-password": {
       "post": {
-        "summary": "Iletisim Formu Gonder",
-        "operationId": "contact",
-        "tags": [
-          "4. Iletisim"
-        ],
+        "operationId": "ForgotController_forgot",
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "firstName",
-                  "lastName",
-                  "email",
-                  "phone",
-                  "subject",
-                  "message"
-                ],
-                "properties": {
-                  "firstName": {
-                    "type": "string"
-                  },
-                  "lastName": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "phone": {
-                    "type": "string"
-                  },
-                  "subject": {
-                    "type": "string"
-                  },
-                  "message": {
-                    "type": "string"
-                  }
-                }
-              },
-              "example": {
-                "firstName": "QA",
-                "lastName": "Contract",
-                "email": "qa_contract_probe@example.com",
-                "phone": "5555555555",
-                "subject": "contract-test",
-                "message": "contract test probe"
+                "$ref": "#/components/schemas/ForgotPasswordDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Form gonderildi",
+            "description": "E-posta gönderildi",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessResponse"
+                  "$ref": "#/components/schemas/ForgotPasswordResponseDto"
                 }
               }
             }
           },
           "400": {
-            "description": "Validasyon hatasi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
+            "description": "Hesap bulunamadı veya geçersiz e-posta"
+          }
+        },
+        "summary": "Şifre sıfırlama e-postası gönder",
+        "tags": [
+          "forgot"
+        ]
+      }
+    },
+    "/api/v1/customer/forgot-password-device-token": {
+      "post": {
+        "operationId": "ForgotController_forgotByDeviceToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDeviceTokenDto"
               }
             }
           }
         },
-        "security": []
+        "responses": {
+          "200": {
+            "description": "E-posta gönderildi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz cihaz token'ı"
+          }
+        },
+        "summary": "Cihaz token ile şifre sıfırlama e-postası gönder",
+        "tags": [
+          "forgot"
+        ]
+      }
+    },
+    "/api/v1/customer/forgot-password/reset": {
+      "post": {
+        "operationId": "ForgotController_forgotReset",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordSetDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Şifre güncellendi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Geçersiz token, süresi dolmuş veya şifreler uyuşmuyor"
+          }
+        },
+        "summary": "Token ile yeni şifre belirle",
+        "tags": [
+          "forgot"
+        ]
+      }
+    },
+    "/api/v1/customer/contact": {
+      "post": {
+        "operationId": "ContactController_submit",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Form başarıyla gönderildi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validasyon hatası"
+          }
+        },
+        "summary": "İletişim formu gönder",
+        "tags": [
+          "contact"
+        ]
       }
     },
     "/api/v1/customer/detail": {
       "get": {
-        "summary": "Profil",
-        "operationId": "customerDetail",
-        "tags": [
-          "5. Profil"
+        "operationId": "CustomerProfileController_detail",
+        "parameters": [
+          {
+            "name": "device-type",
+            "in": "header",
+            "description": "ios veya android",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
-            "description": "Profil",
+            "description": "Müşteri detayı başarıyla getirildi",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessResponse"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LoginCustomerDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
                 }
               }
             }
           },
           "401": {
-            "description": "Token eksik/gecersiz",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+            "description": "Yetkisiz erişim"
+          },
+          "404": {
+            "description": "Müşteri bulunamadı"
           }
         },
-        "security": [
-          {
-            "BearerAuth": []
-          }
+        "summary": "Giriş yapmış müşterinin profil detayını getirir",
+        "tags": [
+          "customer-profile"
         ]
       }
     },
-    "/api/v1/basket/delete": {
-      "delete": {
-        "summary": "Sepetten urun sil",
-        "operationId": "deleteBasket",
-        "tags": [
-          "basket"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteBasketDto"
-              },
-              "example": {
-                "basketHash": "contract-probe-hash",
-                "basketId": 1,
-                "sku": [
-                  "ALTIN-GRAM-1"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Silindi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BasketApiResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Yetkisiz",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Sepet bulunamadi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
+    "/api/v1/getCities/{countryId}": {
+      "get": {
+        "description": "Belirtilen ülke ID'sine ait şehirleri ve her şehrin ilçelerini döner.",
+        "operationId": "CityController_getCities",
+        "parameters": [
           {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/v1/basket/update": {
-      "put": {
-        "summary": "Sepetteki urun miktarini guncelle",
-        "operationId": "updateBasket",
-        "tags": [
-          "basket"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateBasketDto"
-              },
-              "example": {
-                "basketHash": "contract-probe-hash",
-                "sku": "ALTIN-GRAM-1",
-                "qty": 3
-              }
+            "name": "countryId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": 212,
+              "type": "number"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
-            "description": "Guncellendi",
+            "description": "Ülkeye göre şehir listesi (ilçeler dahil)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BasketApiResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Urun bulunamadi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number",
+                            "example": 34
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "İstanbul"
+                          },
+                          "countryId": {
+                            "type": "number",
+                            "example": 212
+                          },
+                          "counties": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number",
+                                  "example": 449
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "example": "Kadıköy"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
           },
           "422": {
-            "description": "Is kurali ihlali",
+            "description": "Country ID must be set",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "statusCode": {
+                      "type": "number",
+                      "example": 422
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Country ID must be set"
+                    }
+                  }
                 }
               }
             }
           }
         },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/api/v1/basket/get": {
-      "get": {
-        "summary": "Sepeti getir",
-        "operationId": "getBasket",
+        "summary": "Ülkeye göre şehir listesi",
         "tags": [
-          "basket"
-        ],
-        "parameters": [
-          {
-            "name": "basketHash",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "example": "contract-probe-hash"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sepet getirildi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BasketApiResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "basketHash gerekli",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Sepet bulunamadi",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
+          "city"
         ]
       }
     },
     "/api/v1/basket/add": {
       "post": {
-        "summary": "Sepete urun ekle",
         "operationId": "addToBasket",
+        "summary": "Sepete urun ekle",
         "tags": [
           "basket"
         ],
@@ -1011,7 +780,7 @@
             }
           },
           "422": {
-            "description": "Is kurali ihlali",
+            "description": "Is kurali",
             "content": {
               "application/json": {
                 "schema": {
@@ -1033,131 +802,642 @@
         },
         "security": [
           {
-            "bearerAuth": []
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/basket/get": {
+      "get": {
+        "operationId": "getBasket",
+        "summary": "Sepeti getir",
+        "tags": [
+          "basket"
+        ],
+        "parameters": [
+          {
+            "name": "basketHash",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "a3f8c2d1e5b9f047"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sepet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasketApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "basketHash gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/basket/update": {
+      "put": {
+        "operationId": "updateBasket",
+        "summary": "Sepet miktar guncelle",
+        "tags": [
+          "basket"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBasketDto"
+              },
+              "example": {
+                "basketHash": "a3f8c2d1e5b9f047",
+                "sku": "ALTIN-GRAM-1",
+                "qty": 3
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Guncellendi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasketApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Is kurali",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/basket/delete": {
+      "delete": {
+        "operationId": "deleteBasket",
+        "summary": "Sepetten urun sil",
+        "tags": [
+          "basket"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteBasketDto"
+              },
+              "example": {
+                "basketHash": "a3f8c2d1e5b9f047",
+                "basketId": 1,
+                "sku": [
+                  "ALTIN-GRAM-1"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Silindi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasketApiResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetkisiz",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
           }
         ]
       }
     }
   },
+  "info": {
+    "title": "Nadir Gold — Customer Service",
+    "description": "Müşteri kimlik doğrulama, profil, adres, KYC API",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "https://api-v2.nadirgold.dev",
+      "description": "Canli (V2)"
+    }
+  ],
   "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
     "schemas": {
-      "ApiSuccess": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          }
-        }
-      },
-      "LoginCustomer": {
+      "LoginCustomerDto": {
         "type": "object",
         "properties": {
           "customerId": {
-            "type": "integer"
+            "type": "number",
+            "example": 100045
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "example": "ahmet@example.com"
           },
           "phone": {
-            "type": "string"
+            "type": "string",
+            "example": "+905551234567"
           },
           "gender": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "object",
+            "example": "MALE",
+            "nullable": true
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "example": "Ahmet"
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "example": "Yılmaz"
           },
           "identityNumber": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "object",
+            "example": "12345678901",
+            "nullable": true
           },
           "photo": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "object",
+            "example": null,
+            "nullable": true
           },
           "birthday": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "object",
+            "example": "1990-01-15",
+            "nullable": true
           },
           "emailVerify": {
-            "type": "integer"
+            "type": "number",
+            "example": 1
           }
-        }
+        },
+        "required": [
+          "customerId",
+          "email",
+          "phone",
+          "gender",
+          "firstName",
+          "lastName",
+          "identityNumber",
+          "photo",
+          "birthday",
+          "emailVerify"
+        ]
       },
-      "LoginResponse": {
+      "LoginResponseDto": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiJ9..."
+          },
+          "customer": {
+            "$ref": "#/components/schemas/LoginCustomerDto"
+          },
+          "deviceToken": {
+            "type": "object",
+            "example": "abc123...",
+            "nullable": true
+          },
+          "basketMerge": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "token",
+          "customer",
+          "deviceToken",
+          "basketMerge"
+        ]
+      },
+      "OtpRequiredResponseDto": {
+        "type": "object",
+        "properties": {
+          "requiresOtp": {
+            "type": "boolean",
+            "example": true
+          },
+          "hash": {
+            "type": "string",
+            "example": "eyJwaG9uZSI6Iis5MDU1NTEyMzQ1NjciLCJleHBpcmUiOjE4MH0="
+          }
+        },
+        "required": [
+          "requiresOtp",
+          "hash"
+        ]
+      },
+      "PreRegisterResponseDto": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string",
+            "example": "a1b2c3d4e5f6..."
+          }
+        },
+        "required": [
+          "hash"
+        ]
+      },
+      "LoginWithDeviceTokenDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "ahmet@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "gizli123"
+          },
+          "logoutHash": {
+            "type": "string",
+            "example": "abc123logouthash",
+            "nullable": true
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "PreRegisterDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "ahmet@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "Ahmet"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Yılmaz"
+          },
+          "hash": {
+            "type": "string",
+            "example": "a1b2c3d4e5f6..."
+          },
+          "password": {
+            "type": "string",
+            "example": "gizli123"
+          },
+          "passwordConfirmation": {
+            "type": "string",
+            "example": "gizli123"
+          },
+          "phone": {
+            "type": "string",
+            "example": "05551234567"
+          },
+          "identityNumber": {
+            "type": "string",
+            "example": "12345678901"
+          },
+          "birthdate": {
+            "type": "string",
+            "example": "1990-01-15"
+          },
+          "kvkk": {
+            "type": "boolean",
+            "example": true,
+            "description": "KVKK sözleşmesi kabul"
+          },
+          "membership": {
+            "type": "boolean",
+            "example": true,
+            "description": "Üyelik sözleşmesi kabul"
+          },
+          "permissionEmail": {
+            "type": "boolean",
+            "example": false,
+            "description": "E-posta pazarlama izni — henüz uygulanmadı, ileride işlenecek"
+          },
+          "permissionSms": {
+            "type": "boolean",
+            "example": false,
+            "description": "SMS pazarlama izni — henüz uygulanmadı, ileride işlenecek"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "hash",
+          "password",
+          "passwordConfirmation",
+          "phone",
+          "identityNumber",
+          "birthdate",
+          "kvkk",
+          "membership"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "ahmet@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "gizli123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "OtpSendResponseDto": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string",
+            "example": "eyJwaG9uZSI6Iis5MDU1NTEyMzQ1NjciLCJleHBpcmUiOjE4MH0="
+          }
+        },
+        "required": [
+          "hash"
+        ]
+      },
+      "OtpVerifyResponseDto": {
+        "type": "object",
+        "properties": {
+          "verified": {
+            "type": "boolean",
+            "example": true
           },
           "data": {
             "type": "object",
-            "properties": {
-              "token": {
-                "type": "string"
-              },
-              "customer": {
-                "$ref": "#/components/schemas/LoginCustomer"
-              },
-              "deviceToken": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "basketMerge": {
-                "type": "boolean"
-              }
-            }
+            "description": "Login/register akışlarında dönen veri"
           }
-        }
+        },
+        "required": [
+          "verified"
+        ]
       },
-      "OtpRequiredResponse": {
+      "OtpResendResponseDto": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string",
+            "example": "eyJwaG9uZSI6Iis5MDU1NTEyMzQ1NjciLCJleHBpcmUiOjE4MH0="
+          }
+        },
+        "required": [
+          "hash"
+        ]
+      },
+      "OtpSendDto": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "example": "05551234567",
+            "description": "Telefon numarası — +90 ile başlayabilir veya 0 ile başlayan 10 haneli format"
+          }
+        },
+        "required": [
+          "phone"
+        ]
+      },
+      "OtpVerifyDto": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string",
+            "example": "eyJwaG9uZSI6Iis5MDU1NTEyMzQ1NjciLCJleHBpcmUiOjE4MH0="
+          },
+          "verifyCode": {
+            "type": "string",
+            "example": "123456",
+            "description": "6 haneli OTP kodu"
+          }
+        },
+        "required": [
+          "hash",
+          "verifyCode"
+        ]
+      },
+      "OtpResendDto": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string",
+            "example": "eyJwaG9uZSI6Iis5MDU1NTEyMzQ1NjciLCJleHBpcmUiOjE4MH0=",
+            "description": "Mevcut OTP hash'i"
+          }
+        },
+        "required": [
+          "hash"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "ahmet@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ForgotPasswordResponseDto": {
         "type": "object",
         "properties": {
           "success": {
-            "type": "boolean"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "requiresOtp": {
-                "type": "boolean"
-              },
-              "hash": {
-                "type": "string"
-              }
-            }
+            "type": "boolean",
+            "example": true
           }
-        }
+        },
+        "required": [
+          "success"
+        ]
       },
-      "SuccessResponse": {
+      "ForgotPasswordDeviceTokenDto": {
+        "type": "object",
+        "properties": {
+          "deviceToken": {
+            "type": "string",
+            "description": "Müşteri cihaz token'ı"
+          }
+        },
+        "required": [
+          "deviceToken"
+        ]
+      },
+      "ForgotPasswordSetDto": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string",
+            "description": "E-posta ile gönderilen şifre sıfırlama token'ı"
+          },
+          "password": {
+            "type": "string",
+            "example": "YeniSifre123"
+          },
+          "passwordConfirmation": {
+            "type": "string",
+            "example": "YeniSifre123"
+          }
+        },
+        "required": [
+          "hash",
+          "password",
+          "passwordConfirmation"
+        ]
+      },
+      "ContactDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "Ahmet"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Yılmaz"
+          },
+          "email": {
+            "type": "string",
+            "example": "ahmet@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+905551234567"
+          },
+          "subject": {
+            "type": "string",
+            "example": "Sipariş hakkında"
+          },
+          "message": {
+            "type": "string",
+            "example": "Siparişim ile ilgili bilgi almak istiyorum."
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "phone",
+          "subject",
+          "message"
+        ]
+      },
+      "ContactResponseDto": {
         "type": "object",
         "properties": {
           "success": {
-            "type": "boolean"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "success": {
-                "type": "boolean"
-              }
-            }
+            "type": "boolean",
+            "example": true
           }
-        }
+        },
+        "required": [
+          "success"
+        ]
       },
       "ErrorResponse": {
         "type": "object",
@@ -1204,35 +1484,6 @@
               "integer",
               "null"
             ]
-          },
-          "transferBankId": {
-            "type": [
-              "integer",
-              "null"
-            ]
-          },
-          "isSubscribe": {
-            "type": [
-              "boolean",
-              "null"
-            ]
-          }
-        }
-      },
-      "GetBasketDto": {
-        "type": "object",
-        "properties": {
-          "basketHash": {
-            "type": "string"
-          },
-          "createBasket": {
-            "type": "boolean"
-          },
-          "orderType": {
-            "$ref": "#/components/schemas/OrderType"
-          },
-          "code": {
-            "type": "string"
           }
         }
       },
@@ -1255,12 +1506,6 @@
           "qty": {
             "type": "integer",
             "minimum": 1
-          },
-          "merchantId": {
-            "type": [
-              "integer",
-              "null"
-            ]
           }
         }
       },
@@ -1305,41 +1550,11 @@
               "null"
             ]
           },
-          "slug": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
           "price": {
             "type": "string"
           },
           "priceTotal": {
             "type": "string"
-          },
-          "discountAmount": {
-            "type": "string"
-          },
-          "orderType": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "isSubscribe": {
-            "type": "integer"
-          },
-          "calculatedAmount": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "transferBankId": {
-            "type": [
-              "integer",
-              "null"
-            ]
           }
         }
       },
@@ -1358,65 +1573,8 @@
           "grandTotal": {
             "type": "string"
           },
-          "subtotal": {
-            "type": "string"
-          },
-          "subtotalInclTax": {
-            "type": "string"
-          },
-          "discountAmount": {
-            "type": "string"
-          },
-          "shippingFee": {
-            "type": "string"
-          },
-          "taxAmount": {
-            "type": "string"
-          },
           "itemsQty": {
             "type": "integer"
-          },
-          "itemsCount": {
-            "type": "integer"
-          },
-          "shippingMethodAlias": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "shippingMethodFeText": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "isSubscribe": {
-            "type": "integer"
-          },
-          "paymentMethod": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "orderType": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "transferBankId": {
-            "type": [
-              "integer",
-              "null"
-            ]
-          },
-          "calculatedAmount": {
-            "type": [
-              "string",
-              "null"
-            ]
           },
           "items": {
             "type": "array",
@@ -1436,22 +1594,6 @@
             "$ref": "#/components/schemas/BasketResponseDto"
           }
         }
-      }
-    },
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      },
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      },
-      "bearer": {
-        "type": "http",
-        "scheme": "bearer"
       }
     }
   }

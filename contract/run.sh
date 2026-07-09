@@ -38,10 +38,13 @@ fi
 # Yan etkili (kayit/SMS/e-posta ureten) endpointler varsayilan olarak haric.
 if [ "${INCLUDE_SIDE_EFFECTS:-0}" != "1" ]; then
   ARGS+=(
+    --exclude-path /api/v1/customer/register
     --exclude-path /api/v1/customer/contact
     --exclude-path /api/v1/customer/otp
     --exclude-path /api/v1/customer/otp/resend
-    --exclude-path /api/v1/customer/forgotPassword
+    --exclude-path /api/v1/customer/forgot-password
+    --exclude-path /api/v1/customer/forgot-password-device-token
+    --exclude-path /api/v1/customer/forgot-password/reset
   )
 fi
 
