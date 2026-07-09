@@ -71,9 +71,34 @@ Rapor: `reports/report.html`
 | `test_profile.py` | customer/detail |
 | `test_basket.py` | add · get · update · delete (misafir e2e) |
 
+## Contract Testing (Schemathesis)
+
+Canlı API'nin **Apidog `nadir-v2` sözleşmesine** uyumunu doğrular. Kaynak spec
+Apidog MCP ile çekilip [`contract/openapi.json`](./contract/openapi.json) olarak
+bundle edilir; [`contract/build_openapi.py`](./contract/build_openapi.py) yeniden
+üretir. Schemathesis **`examples` fazı** kullanılır: her endpoint için yalnızca
+dokümante örnek istek gönderilir (fuzzing yok), yanıtın **status / şema /
+content-type** sözleşmeye uyup uymadığı kontrol edilir.
+
+```bash
+./contract/run.sh                          # güvenli varsayılan (yan etkili endpointler hariç)
+INCLUDE_SIDE_EFFECTS=1 ./contract/run.sh   # contact / otp / forgotPassword dahil
+AUTH_TOKEN=<jwt> ./contract/run.sh         # auth-gated endpointler için Bearer token
+```
+
+Rapor: `reports/contract-junit.xml`
+
+> Contract koşumu, dokümandaki yol farklarını **otomatik** yakalar; örn.
+> `POST /auth/login`, `otp/verify`, `forgotPasswordSet` canlıda **404** →
+> "Undocumented HTTP status code" olarak raporlanır. Tüm farklar: [`DISCREPANCIES.md`](./DISCREPANCIES.md).
+
 ## Yapı
 
 ```
+contract/
+  build_openapi.py     # Apidog split OAS -> tek bundle (contract/openapi.json)
+  openapi.json         # bundle edilmis OpenAPI 3.1 sozlesme
+  run.sh               # Schemathesis contract kosum betigi (guvenli/tam profiller)
 tests/
   conftest.py          # config, misafir + authlı client, auth_token, sema yukleyici
   api/
