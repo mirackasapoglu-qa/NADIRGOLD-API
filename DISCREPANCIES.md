@@ -51,6 +51,41 @@ Gateway (443) üzerinde 404 dönüyor:
 - `GET /api/v1/basket/get` · `PUT /api/v1/basket/update` · `DELETE /api/v1/basket/delete` → 404
 - `POST /api/v1/basket/add` → **503** (route var ama arkadaki commerce servisi kapalı)
 
+## 🔵 V1 → V2 Dönüşüm Farkları (statik doküman karşılaştırması)
+
+Kaynak: V1 `NadirgoldV1.md` (Apidog export, 235 uç) ↔ V2 `nadir-v2` (16 müşteri ucu). Karşılaştırma **16 örtüşen uç** ile sınırlı; V2 sütunu **canlı/doğrulanmış** yolu gösterir.
+
+> ⚠️ V1 export'unda 16 ucun tamamında `Responses Data Schema` **boş** → yanıt gövdesi alan-alan kıyaslanamadı; karşılaştırma **istek + yol/metot** ile sınırlı.
+
+### 🔴 Yüksek önem — arayüz kıran farklar
+
+| Uç | Eski (V1) | Yeni (V2) | Fark |
+|---|---|---|---|
+| Login | `POST /customer/login` · `username`+`password` | `POST /customer/login` · **`email`**+`password` | Alan `username`→`email` |
+| Sepet getir | `POST /basket/get` · `basket_hash` | **`GET`** `/basket/get` · query `basketHash` | Metot POST→GET + `basket_hash`→`basketHash` |
+| Sepet güncelle | `POST /basket/update` | **`PUT`** `/basket/update` | Metot POST→PUT |
+| Sepet sil | `POST /basket/delete` | **`DELETE`** `/basket/delete` | Metot POST→DELETE |
+| OTP gönder | `POST /customer/sendCode` | `POST /customer/otp` | Yol yeniden adlandırıldı |
+| OTP yeniden gönder | `POST /customer/resendCode` | `POST /customer/otp/resend` | Yol yeniden adlandırıldı |
+| OTP doğrula | `POST /customer/otpVerify` | `POST /customer/otp/verify` | `otpVerify`→`otp/verify` |
+| Şifre sıfırla (iste) | `POST /customer/forgotPassword` · **`phone`** | `POST /customer/forgot-password` · **`email`** | camelCase→kebab **+ tetikleyici telefon→e-posta** |
+| İletişim | `POST /customer/contact` · **snake_case** | `POST /customer/contact` · **camelCase** | Alan adları snake→camel |
+
+### 🟠 Orta önem
+
+| Uç | Eski (V1) | Yeni (V2) | Fark |
+|---|---|---|---|
+| Ön kayıt | `POST /customer/preRegister` | `POST /customer/pre-register` | camelCase→kebab |
+| Header'lar | `Device-Type` / `Content-Language` (bazı uçlar zorunlu) | Dokümante değil | V2'de kaldırılmış/opsiyonel |
+
+### 🟢 Değişmemiş
+`logout` · `register` · `forgotPasswordSet` · `customer/detail` (GET) · `basket/add` (POST) · `customer/delete` (DELETE) → yol + metot aynı.
+
+### Notlar
+- V1'in `login` yolu (`/customer/login`), V2'nin **canlı** yoluyla aynı — ama V2 *Apidog dokümanı* yanlışlıkla `/auth/login` diyor (NSB-5855). V2 dokümanı hem V1'den hem V2-canlıdan geri kalmış.
+- V1 iç tutarsızlıkları: `basket/get` → `basket_hash` (snake), diğerleri `basketHash` (camel); `merchantId` Add'te string / Update'te integer; yol prefix'i (`/DOMAIN/`) bazı uçlarda var bazılarında yok.
+- **Kapsam:** V2 yalnızca bu 16 müşteri ucunu kapsıyor; V1'deki diğer ~219 uç (adres, banka, KYC, tasarruf, sipariş, LOGO, lojistik…) V2 `nadir-v2` spec'inde yok.
+
 ## ✅ Kayıt (register) akışı — kurallar
 
 `register` **OTP kapalı** ve doğrudan token dönüyor → test suite dışarıdan hesap gerektirmeden kendi hesabını yaratıp login/logout/profil'i test edebiliyor. Ancak:
