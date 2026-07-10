@@ -16,7 +16,8 @@ SCHEMA_DIR = ROOT / "schemas"
 def config():
     """Ortam degiskenlerinden yapilandirma."""
     return {
-        "base_url": os.getenv("BASE_URL", "").rstrip("/"),
+        # BASE_URL tanimli degilse calisan canli adrese dus (repoda dokumanli, gizli degil)
+        "base_url": os.getenv("BASE_URL", "https://api-v2.nadirgold.dev").rstrip("/"),
         "timeout": int(os.getenv("TIMEOUT", "15")),
         "test_email": os.getenv("TEST_EMAIL", ""),
         "test_password": os.getenv("TEST_PASSWORD", ""),
