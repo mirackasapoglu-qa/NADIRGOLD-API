@@ -10,10 +10,11 @@ LOGIN = "/api/v1/customer/login"          # DOKUMAN FARKI: dokumanda /api/v1/aut
 LOGOUT = "/api/v1/customer/logout"        # dogrulandi (401 auth gerekiyor)
 PRE_REGISTER = "/api/v1/customer/pre-register"  # dogrulandi
 REGISTER = "/api/v1/customer/register"    # dogrulandi
+DELETE_ACCOUNT = "/api/v1/customer/delete"  # dogrulandi (tokensiz 401; hesabi pasife alir)
 
 # 2. Sifre Sifirlama
 FORGOT_PASSWORD = "/api/v1/customer/forgot-password"  # DOKUMAN FARKI: dokumanda /forgotPassword (404)
-FORGOT_PASSWORD_SET = "/api/v1/customer/forgotPasswordSet"  # BULUNAMADI: bu ve varyantlari 404. Gateway /customer/forgot-password/* -> /auth/forgot-password/* olarak yeniden yazliyor; dogru yol netlesince guncellenecek.
+FORGOT_PASSWORD_SET = "/api/v1/customer/forgot-password/reset"  # dogrulandi (otoritatif spec + canli 400). Eski denenen /forgotPasswordSet yanlisti.
 
 # 3. OTP
 OTP_SEND = "/api/v1/customer/otp"                 # dogrulandi

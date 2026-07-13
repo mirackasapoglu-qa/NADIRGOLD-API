@@ -128,3 +128,13 @@ def test_logout_basarili(authed_api):
     r = authed_api.post(ep.LOGOUT)
     assert_status(r, 200)
     assert r.json().get("success") is True
+
+
+# ---------------------------------------------------------------- delete (hesap)
+
+@pytest.mark.negative
+def test_delete_hesap_tokensiz_401(api, load_schema):
+    """DELETE /customer/delete tokensiz → 401 (hesabi pasife alir, auth zorunlu)."""
+    r = api.delete(ep.DELETE_ACCOUNT)
+    assert_status(r, 401)
+    assert_schema(r.json(), load_schema("error"))

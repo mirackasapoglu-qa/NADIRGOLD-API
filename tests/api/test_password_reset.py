@@ -20,10 +20,9 @@ def test_forgot_password_gecersiz_email(api):
     )
 
 
-# forgotPasswordSet: dokumandaki yol (/customer/forgotPasswordSet) ve denenen
-# varyantlar canli API'de 404. Dogru yol netlesene kadar xfail.
+# forgotPasswordSet gercek yolu: /customer/forgot-password/reset (otoritatif spec).
+# Eski denenen /forgotPasswordSet yanlisti; gercek yol canli 400 donuyor (NSB-5864).
 @pytest.mark.negative
-@pytest.mark.xfail(reason="Endpoint yolu dogrulanamadi — canli API'de 404", strict=False)
 def test_forgot_password_set_gecersiz_hash_400(api, load_schema):
     r = api.post(ep.FORGOT_PASSWORD_SET, json={
         "hash": "gecersiz-veya-suresi-dolmus-hash",
@@ -35,7 +34,6 @@ def test_forgot_password_set_gecersiz_hash_400(api, load_schema):
 
 
 @pytest.mark.negative
-@pytest.mark.xfail(reason="Endpoint yolu dogrulanamadi — canli API'de 404", strict=False)
 def test_forgot_password_set_sifreler_uyusmuyor_400(api, load_schema):
     r = api.post(ep.FORGOT_PASSWORD_SET, json={
         "hash": "herhangi-bir-hash",
