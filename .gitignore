@@ -8,3 +8,5 @@ venv/
 .hypothesis/
 schemathesis-report/
 captures/
+.otp_state.json
+contract/.otp_state.json
