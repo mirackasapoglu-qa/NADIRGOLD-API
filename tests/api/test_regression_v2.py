@@ -90,25 +90,28 @@ def test_getprices_finansal_string(api):
 
 
 @pytest.mark.regression
-@pytest.mark.xfail(reason="NSB-5962: getPrices 201 donuyor, okuma islemi 200 olmali", strict=True)
 def test_getprices_status_200(api):
-    """BUG: POST /getPrices okuma islemi ama 201 Created donuyor; 200 olmali."""
+    """NSB-5962 DUZELDI (2026-07-17): getPrices artik 200 donuyor (onceki 201).
+    Regresyon korumasi — tekrar 201'e donerse kirmizi verir."""
     r = api.post(ep.PRODUCT_GET_PRICES, json={"productId": 11})
-    assert r.status_code == 200
+    assert r.status_code == 200, f"200 bekleniyor (NSB-5962 regresyon), gelen {r.status_code}"
 
 
 @pytest.mark.regression
-@pytest.mark.xfail(reason="NSB-5901: taxId string donuyor, number olmali", strict=True)
 def test_getprices_taxid_numeric(api):
+    """NSB-5901 DUZELDI (2026-07-17): taxId artik number (onceki '3' string)."""
     r = api.post(ep.PRODUCT_GET_PRICES, json={"productId": 11})
-    assert isinstance(r.json()["data"][0]["taxId"], int)
+    assert isinstance(r.json()["data"][0]["taxId"], int), "taxId number olmali (NSB-5901 regresyon)"
 
 
 # =============================================================== getPriceHistory (NSB-5401)
 
 @pytest.mark.regression
+@pytest.mark.xfail(reason="NSB-5963 KOTULESTI (2026-07-17): getPriceHistory tum urunlerde 500 crash "
+                          "(onceki 200+bos). Duzelince XPASS ile uyarir.", strict=True)
 def test_getpricehistory_yapi(api):
-    """Yapi: {oneMonth, threeMonth, sixMonth, oneYear} her biri {label, value[]}."""
+    """Yapi: {oneMonth, threeMonth, sixMonth, oneYear} her biri {label, value[]}.
+    2026-07-17 itibariyle uc 500 donuyor (regresyon)."""
     r = api.get(f"{ep.PRODUCT_GET_PRICE_HISTORY}/11")
     assert_status(r, 200)
     data = r.json()["data"]
